@@ -264,7 +264,8 @@ namespace Uno.UI.Helpers.WinUI
 		static bool? s_isBringIntoViewOptionsVerticalAlignmentRatioAvailable;
 		public static bool IsBringIntoViewOptionsVerticalAlignmentRatioAvailable()
 		{
-			if (s_isBringIntoViewOptionsVerticalAlignmentRatioAvailable == null) {
+			if (s_isBringIntoViewOptionsVerticalAlignmentRatioAvailable == null)
+			{
 				s_isBringIntoViewOptionsVerticalAlignmentRatioAvailable =
 					IsRS4OrHigher() ||
 					ApiInformation.IsPropertyPresent("Windows.UI.Xaml.BringIntoViewOptions", "VerticalAlignmentRatio");
@@ -941,6 +942,19 @@ namespace Uno.UI.Helpers.WinUI
 			}
 
 			return FindInVisualTreeInner(parent, isMatch);
+		}
+
+		public static bool IsFrameworkElementLoaded(FrameworkElement frameworkElement)
+		{
+			if (IsRS5OrHigher())
+			{
+				// TODO:MZ: Does this work everywhere?
+				return frameworkElement.IsLoaded;
+			}
+			else
+			{
+				return VisualTreeHelper.GetParent(frameworkElement) != null;
+			}
 		}
 
 		public static bool IsTrue(bool? nullableBool)
