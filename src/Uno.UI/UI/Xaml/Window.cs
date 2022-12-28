@@ -13,12 +13,14 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Uno.Foundation.Logging;
 using Uno.UI.Xaml.Core;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Markup;
 
 namespace Windows.UI.Xaml
 {
 	/// <summary>
 	/// Represents an application window.
 	/// </summary>
+	[ContentProperty(Name = nameof(Content))]
 	public sealed partial class Window
 	{
 		private static Window _current;
