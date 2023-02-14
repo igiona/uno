@@ -1204,6 +1204,7 @@ namespace Windows.UI.Xaml.Controls
 			//Prepare ContentPresenter
 			if (element is ContentPresenter containerAsContentPresenter)
 			{
+				containerAsContentPresenter.IsInsideItemsControl = true;
 				containerAsContentPresenter.ContentTemplate = ItemTemplate;
 				containerAsContentPresenter.ContentTemplateSelector = ItemTemplateSelector;
 

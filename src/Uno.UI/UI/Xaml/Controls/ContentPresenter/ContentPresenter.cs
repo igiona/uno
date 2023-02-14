@@ -65,6 +65,8 @@ namespace Windows.UI.Xaml.Controls
 		/// </summary>
 		internal bool IsUsingDefaultTemplate { get; private set; }
 
+		internal bool IsInsideItemsControl { get; set; }
+
 		/// <summary>
 		/// Determines if the current ContentPresenter is hosting a native control.
 		/// </summary>
@@ -811,11 +813,17 @@ namespace Windows.UI.Xaml.Controls
 			{
 				_firstLoadResetDone = true;
 
-				// On first load UWP clears the local value of a ContentPresenter.
-				// The reason for this behavior is unknown.
-				this.ClearValue(DataContextProperty, DependencyPropertyValuePrecedences.Local);
+				// if (!IsInsideItemsControl)
+				{
+					if (!ReferenceEquals(DataContext, Content))
+					{
+						// On first load UWP clears the local value of a ContentPresenter.
+						// The reason for this behavior is unknown.
+						this.ClearValue(DataContextProperty, DependencyPropertyValuePrecedences.Local);
 
-				TrySetDataContextFromContent(Content);
+						TrySetDataContextFromContent(Content);
+					}
+				}
 
 				return true;
 			}
