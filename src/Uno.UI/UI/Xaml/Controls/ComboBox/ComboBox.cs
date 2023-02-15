@@ -232,6 +232,64 @@ namespace Windows.UI.Xaml.Controls
 			UpdateHeaderVisibility();
 		}
 
+		protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
+		{
+			SynchronizeContainerInheritedProperties(element, item);
+
+			base.PrepareContainerForItemOverride(element, item);
+		}
+
+		protected override void ClearContainerForItemOverride(DependencyObject element, object item)
+		{
+			ClearContainerInheritedProperties(element, item);
+
+			base.ClearContainerForItemOverride(element, item);
+		}
+
+		/// <summary>
+		/// Explicitly propagate inherited properties values to the item containers, as they are not direct visual children of the ComboBox.
+		/// </summary>
+		private void SynchronizeContainerInheritedProperties(DependencyObject element, object item)
+		{
+			if (element is ContentControl cc && !IsItemItsOwnContainer(item))
+			{
+				foreach (var comboBoxProperty in DependencyProperty.GetPropertiesForType(this.GetType()))
+				{
+					if (comboBoxProperty.GetMetadata(this.GetType()) is FrameworkPropertyMetadata fpm
+						&& fpm.Options.HasInherits())
+					{
+						if (DependencyProperty.GetProperty(cc.GetType(), comboBoxProperty.Name) is { } containerProperty)
+						{
+							// Force the local precedence to override the implicit style precedence set from
+							// the ContentControl default style.
+							cc.SetValue(containerProperty, this.GetValue(comboBoxProperty), DependencyPropertyValuePrecedences.Local);
+						}
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Explicitly clear inherited properties values to the item containers, as they are not direct visual children of the ComboBox.
+		/// </summary>
+		private void ClearContainerInheritedProperties(DependencyObject element, object item)
+		{
+			if (element is ContentControl cc && !IsItemItsOwnContainer(item))
+			{
+				foreach (var comboBoxProperty in DependencyProperty.GetPropertiesForType(this.GetType()))
+				{
+					if (comboBoxProperty.GetMetadata(this.GetType()) is FrameworkPropertyMetadata fpm
+						&& fpm.Options.HasInherits())
+					{
+						if (DependencyProperty.GetProperty(cc.GetType(), comboBoxProperty.Name) is { } containerProperty)
+						{
+							cc.ClearValue(containerProperty, DependencyPropertyValuePrecedences.Local);
+						}
+					}
+				}
+			}
+		}
+
 		private void UpdateHeaderVisibility()
 		{
 			var headerVisibility = (Header != null || HeaderTemplate != null)
