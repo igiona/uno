@@ -34,7 +34,7 @@ using WindowSizeChangedEventArgs = Windows.UI.Core.WindowSizeChangedEventArgs;
 
 namespace Windows.UI.Xaml.Controls
 {
-	public partial class ComboBox : Selector
+	public partial class ComboBox : Selector, IThemeChangeAware
 	{
 		public event EventHandler<object>? DropDownClosed;
 		public event EventHandler<object>? DropDownOpened;
@@ -251,18 +251,18 @@ namespace Windows.UI.Xaml.Controls
 		/// </summary>
 		private void SynchronizeContainerInheritedProperties(DependencyObject element, object item)
 		{
-			if (element is ContentControl cc && !IsItemItsOwnContainer(item))
+			if (!IsItemItsOwnContainer(item))
 			{
 				foreach (var comboBoxProperty in DependencyProperty.GetPropertiesForType(this.GetType()))
 				{
 					if (comboBoxProperty.GetMetadata(this.GetType()) is FrameworkPropertyMetadata fpm
 						&& fpm.Options.HasInherits())
 					{
-						if (DependencyProperty.GetProperty(cc.GetType(), comboBoxProperty.Name) is { } containerProperty)
+						if (DependencyProperty.GetProperty(element.GetType(), comboBoxProperty.Name) is { } containerProperty)
 						{
 							// Force the local precedence to override the implicit style precedence set from
 							// the ContentControl default style.
-							cc.SetValue(containerProperty, this.GetValue(comboBoxProperty), DependencyPropertyValuePrecedences.Local);
+							element.SetValue(containerProperty, GetValue(comboBoxProperty), DependencyPropertyValuePrecedences.Local);
 						}
 					}
 				}
@@ -274,16 +274,16 @@ namespace Windows.UI.Xaml.Controls
 		/// </summary>
 		private void ClearContainerInheritedProperties(DependencyObject element, object item)
 		{
-			if (element is ContentControl cc && !IsItemItsOwnContainer(item))
+			if (!IsItemItsOwnContainer(item))
 			{
 				foreach (var comboBoxProperty in DependencyProperty.GetPropertiesForType(this.GetType()))
 				{
 					if (comboBoxProperty.GetMetadata(this.GetType()) is FrameworkPropertyMetadata fpm
 						&& fpm.Options.HasInherits())
 					{
-						if (DependencyProperty.GetProperty(cc.GetType(), comboBoxProperty.Name) is { } containerProperty)
+						if (DependencyProperty.GetProperty(element.GetType(), comboBoxProperty.Name) is { } containerProperty)
 						{
-							cc.ClearValue(containerProperty, DependencyPropertyValuePrecedences.Local);
+							element.ClearValue(containerProperty, DependencyPropertyValuePrecedences.Local);
 						}
 					}
 				}
@@ -693,6 +693,16 @@ namespace Windows.UI.Xaml.Controls
 			{
 				GoToState(useTransitions, "Unfocused");
 			}
+		}
+
+		public void OnThemeChanged()
+		{
+			// Force a reset of the list when the theme changes,
+			// so items get rebuilt completely and execute `SynchronizeContainerInheritedProperties`.
+			OnItemsSourceSingleCollectionChanged(
+				this,
+				new(global::System.Collections.Specialized.NotifyCollectionChangedAction.Reset),
+				0);
 		}
 
 		public LightDismissOverlayMode LightDismissOverlayMode
