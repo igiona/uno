@@ -872,7 +872,7 @@ namespace Uno.UI.SourceGenerators.XamlGenerator
 					{
 						// Declare master dictionary
 						writer.AppendLine();
-						writer.AppendLineIndented("internal static global::Windows.UI.Xaml.ResourceDictionary MasterDictionary { get; } = new global::Windows.UI.Xaml.ResourceDictionary();");
+						writer.AppendLineIndented("internal static global::Microsoft.UI.Xaml.ResourceDictionary MasterDictionary { get; } = new global::Microsoft.UI.Xaml.ResourceDictionary();");
 					}
 
 					// Generate all the partial methods, even if they don't exist. That avoids
