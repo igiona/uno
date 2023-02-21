@@ -61,7 +61,7 @@ namespace Uno.UI.Runtime.Skia
 
 					if (File.Exists(libPath))
 					{
-						if (Linux.dlopen(libPath, true) != 0)
+						if (Linux.dlopen(libPath, true) != IntPtr.Zero)
 						{
 							if (this.Log().IsEnabled(LogLevel.Trace))
 							{
